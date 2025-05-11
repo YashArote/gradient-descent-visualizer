@@ -260,9 +260,20 @@ function plotSurface() {
     }, {
         responsive: true,
         displayModeBar: false
-    }).then(()=>{
+    }).then(() => {
         attachPlotInteractionWarning()
     });
+
+    const plotDiv = document.getElementById('plot');
+    plotDiv.addEventListener('touchstart', function (e) {
+        e.preventDefault();
+        Plotly.Fx.hover(plotDiv, e);
+        setTimeout(() => {
+            if (plotDiv._hoverdata) {
+                Plotly.Fx.click(plotDiv, e);
+            }
+        }, 120);
+    }, { passive: false });
 
     document.getElementById('plot').on('plotly_click', function (data) {
         const w = data.points[0].x;
