@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>3D Loss Surface with Gradient Descent</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <link href="style.css" rel="stylesheet">
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/11.11.0/math.min.js"></script>
+
+</head>
+
+<body class="bg-light">
+
+    <div class="container-fluid mt-4">
+        <h2 class="mb-4 text-center heading-style">Visualizing Optimizer Dynamics on a Loss Surface</h2>
+        <div class="ms-3">
+            <span class="d-inline-block" tabindex="0" data-bs-toggle="tooltip" data-bs-html="true" title="
+    <strong>Instructions:</strong><br>
+    1) Enter your loss function using syntax compatible with <code>math.js</code>.<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;Example: <code>sin(w) + cos(b)^2 + exp(w * b) + (w^2 + b^2 - 5)^2</code><br>
+    2) Click anywhere on the plot to place the initial marker.
+">
+                <button class="btn btn-outline-info btn-sm rounded-circle">i</button>
+            </span>
+
+        </div>
+        <div class="container mb-3">
+            <div class="row g-3 align-items-end">
+
+
+                <div class="col-md-4 col-sm-6 col-12">
+                    <label for="userFunction" class="form-label">Loss Function:</label>
+                    <input type="text" class="form-control" id="userFunction"
+                        value="Math.pow(w*w + b - 11, 2) + Math.pow(w + b*b - 7, 2)">
+                </div>
+
+
+                <div class="col-auto">
+                    <label for="markerSize" class="form-label">Marker Size (px):</label>
+                    <input type="number" class="form-control" id="markerSize" min="1" max="100" value="10">
+                </div>
+
+
+                <div class="col-auto">
+                    <label for="speedSelect" class="form-label">Animation Speed:</label>
+                    <select id="speedSelect" class="form-select">
+                        <option value="200">Slow</option>
+                        <option value="100" selected>Normal</option>
+                        <option value="40">Fast</option>
+                    </select>
+                </div>
+
+
+                <div class="col-md-3 col-sm-6 col-12">
+                    <label for="surfaceSelect" class="form-label">Surface Type:</label>
+                    <select id="surfaceSelect" class="form-select">
+                        <option value="default" selected>--</option>
+                        <option value="global">Global Minimum</option>
+                        <option value="local">Local Minimum</option>
+                        <option value="elliptical">Elliptical Bowl</option>
+                        <option value="saddle">Saddle Point</option>
+                        <option value="hills">Hills</option>
+                        <option value="plateau">Plateau</option>
+                    </select>
+                </div>
+
+                <div class="col-auto">
+                    <label for="weightRange" class="form-label">Weight Range:</label>
+                    <input type="text" class="form-control" id="weightRange" value="-5,5">
+                </div>
+
+                <div class="col-auto">
+                    <label for="biasRange" class="form-label">Bias Range:</label>
+                    <input type="text" class="form-control" id="biasRange" value="-5,5">
+                </div>
+                <div class="col-md-3 col-sm-6 col-12">
+                    <label for="optimizerSelect" class="form-label">Optimizer:</label>
+                    <select id="optimizerSelect" class="form-select">
+                        <option value="gradientDescent">Gradient Descent</option>
+                        <option value="momentum">Momentum</option>
+                        <option value="adagrad">Adagrad</option>
+                        <option value="rmsprop">RMSprop</option>
+                        <option value="adam">Adam</option>
+                    </select>
+                </div>
+
+                <div class="col-auto" id="learningRateField">
+                    <label for="learningRate" class="form-label">Learning Rate:</label>
+                    <input type="number" class="form-control" id="learningRate" value="0.01" step="0.001">
+                </div>
+
+                <div class="col-auto" id="momentumField" style="display: none;">
+                    <label for="momentum" class="form-label">Momentum (β):</label>
+                    <input type="number" class="form-control" id="momentum" value="0.9" step="0.01">
+                </div>
+
+                <div class="col-auto" id="decayRateField" style="display: none;">
+                    <label for="decayRate" class="form-label">Decay Rate (γ):</label>
+                    <input type="number" class="form-control" id="decayRate" value="0.01" step="0.001">
+                </div>
+
+                <div class="col-auto" id="beta1Field" style="display: none;">
+                    <label for="beta1" class="form-label">Beta1 (β₁):</label>
+                    <input type="number" class="form-control" id="beta1" value="0.9" step="0.01">
+                </div>
+
+                <div class="col-auto" id="beta2Field" style="display: none;">
+                    <label for="beta2" class="form-label">Beta2 (β₂):</label>
+                    <input type="number" class="form-control" id="beta2" value="0.999" step="0.01">
+                </div>
+            </div>
+        </div>
+
+
+        <div class="plot-control-wrapper">
+            <div class="control-panel">
+                <button class="btn btn-primary mb-2" onclick="plotSurface()">Plot</button>
+                <button class="btn btn-success mb-2" onclick="startAnimation()">Start</button>
+                <button class="btn btn-warning mb-2" onclick="pauseAnimation()">Pause</button>
+                <button class="btn btn-danger" onclick="resetAnimation()">Reset</button>
+            </div>
+            <div id="plot" class="plot-container"></div>
+            <div id="pauseAlert" class="position-fixed bottom-0 end-0 m-3 alert alert-warning fade" role="alert"
+                style="z-index: 1050;">
+                Please pause to perform those operations.
+            </div>
+
+        </div>
+    </div>
+
+    <script src="setup.js"></script>
+    <script src="main.js"></script>
+</body>
+
+</html>
