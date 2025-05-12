@@ -5,6 +5,7 @@ let animationInterval;
 let wValues, bValues, zValues;
 let wRange = [-5, 5], bRange = [-5, 5];
 let compiledLossExpr, gradientW, gradientB;
+let w, b, z;
 const step = 0.1;
 
 let markerTrace = {
@@ -155,11 +156,13 @@ function pauseAnimation() {
 
 function resetAnimation() {
     pauseAnimation();
+    currentW = w;
+    currentB = b;
     markerTrace.marker.size = parseInt(document.getElementById('markerSize').value) || 16;
     Plotly.animate('plot', {
         data: [
             null,
-            { x: [], y: [], z: [], marker: { color: 'red', size: markerTrace.marker.size } }
+            { x: [w], y: [b], z: [z], marker: { color: 'red', size: markerTrace.marker.size } }
         ]
     }, {
         transition: { duration: 0 },
@@ -264,21 +267,10 @@ function plotSurface() {
         attachPlotInteractionWarning()
     });
 
-    const plotDiv = document.getElementById('plot');
-    plotDiv.addEventListener('touchstart', function (e) {
-        e.preventDefault();
-        Plotly.Fx.hover(plotDiv, e);
-        setTimeout(() => {
-            if (plotDiv._hoverdata) {
-                Plotly.Fx.click(plotDiv, e);
-            }
-        }, 120);
-    }, { passive: false });
-
     document.getElementById('plot').on('plotly_click', function (data) {
-        const w = data.points[0].x;
-        const b = data.points[0].y;
-        const z = lossFunc(w, b) + getZOffset();
+        w = data.points[0].x;
+        b = data.points[0].y;
+        z = lossFunc(w, b) + getZOffset();
         currentW = w;
         currentB = b;
 

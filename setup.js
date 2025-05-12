@@ -67,37 +67,37 @@ document.getElementById('optimizerSelect').addEventListener('change', function (
 document.getElementById('optimizerSelect').dispatchEvent(new Event('change'));
 const surfacePresets = {
     default: {
-        func: "Math.pow(w*w + b - 11, 2) + Math.pow(w + b*b - 7, 2)",
+        func: "pow(w*w + b - 11, 2) + pow(w + b*b - 7, 2)",
         wRange: [-5, 5],
         bRange: [-5, 5]
     },
     global: {
-        func: "Math.pow(w, 2) + Math.pow(b, 2)",
+        func: "pow(w, 2) + pow(b, 2)",
         wRange: [-5, 5],
         bRange: [-5, 5]
     },
     local: {
-        func: "(1 - 8*w + 7*w**2 - (7/3)*w**3 + 0.25*w**4) * b**2 * Math.exp(-b)",
+        func: "(1 - 8*w + 7*w**2 - (7/3)*w**3 + 0.25*w**4) * b**2 * exp(-b)",
         wRange: [0, 5],
         bRange: [0, 6]
     },
     elliptical: {
-        func: "4 * Math.pow(w, 2) + Math.pow(b, 2)",
+        func: "4 * pow(w, 2) + pow(b, 2)",
         wRange: [-3, 3],
         bRange: [-5, 5]
     },
     saddle: {
-        func: "Math.pow(w, 2) - Math.pow(b, 2)",
+        func: "pow(w, 2) - pow(b, 2)",
         wRange: [-5, 5],
         bRange: [-5, 5]
     },
     hills: {
-        func: "Math.sin(w) + Math.cos(b)",
+        func: "sin(w) + cos(b)",
         wRange: [-6.3, 6.3],
         bRange: [-6.3, 6.3]
     },
     plateau: {
-        func: "Math.tanh(w) + Math.tanh(b)",
+        func: "tanh(w) + tanh(b)",
         wRange: [-5, 5],
         bRange: [-5, 5]
     }
